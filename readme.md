@@ -14,8 +14,7 @@ A short escape if there ever was one. Shy of 2 months later there are 7 dependen
 and this is without the aid of any "modern" dependency management tool. It is a
 slippery slope, glazed with the blood of good intention.
 
-To start out and get over the hump I have allowed myself 3 plug 'n' play
-libraries:
+These are the spoils of war:
 
 * javax.servlet-api-3.1.0.jar
 * jetty-all-9.1.1.v20140108.jar
