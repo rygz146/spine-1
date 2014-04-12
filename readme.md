@@ -1,8 +1,8 @@
 VivaLabs
 ========
 
-We get so much for "free" when building nowadays that it feels more like my
-day consists more of consuming than producing.
+We get so much for "free" when building nowadays that my day consists of
+consuming rather than producing.
 
 When you sell your craft by time then every unit has to be spent wisely.
 
