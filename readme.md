@@ -10,16 +10,28 @@ This is my escape and has only one intent:
 
     Be as framework-less as possible.
 
+A short escape if there ever was one. Shy of 2 months later there are 7 dependencies
+and this is without the aid of any "modern" dependency management tool. It is a
+slippery slope, glazed with the blood of good intention.
+
 To start out and get over the hump I have allowed myself 3 plug 'n' play
 libraries:
 
 * javax.servlet-api-3.1.0.jar
 * jetty-all-9.1.1.v20140108.jar
-* [org.json.*](http://www.json.org/java/index.html)
+* velocity-1.7.jar
+* markdown4j-2.2.jar
+* guava-16.0.1.jar
+* commons-collections-3.2.1.jar
+* commons-lang-2.4.jar
 
 By end of 2014 all of them will be replaced with hand-rolled counterparts.
 
+Hah, now that I've pulled in guava for "something neat" I've pretty much
+screwed the pooch already.
 
-Stop work time and begin playtime. Make something cool.
+This holds true then as now:
+
+    Stop work time and begin playtime. Make something cool.
 
 /v.
