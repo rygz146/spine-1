@@ -8,14 +8,14 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import java.io.IOException;
 
 /**
- * Application
+ * Spine
  */
-public class Application {
+public class Spine {
 
     private final Server server;
     private final ServletContextHandler context;
 
-    public Application(int port, String path) throws IOException {
+    public Spine(int port, String path) throws IOException {
         server = new Server(port);
         context = new ServletContextHandler
             (ServletContextHandler.SESSIONS);

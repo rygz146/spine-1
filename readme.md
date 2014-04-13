@@ -1,5 +1,5 @@
-VivaLabs
-========
+Spine
+=====
 
 We get so much for "free" when building nowadays that my day consists of
 consuming rather than producing.
