@@ -97,7 +97,8 @@ public class SpineBinder
 
             ByteSource bs = Files.asByteSource(vertabrae.path().toFile());
             String html = md.process(bs.openBufferedStream());
-            String template = "default.vm";
+
+            String template = pick_template(vertabrae.file_name());
 
             VelocityContext velocity_context = new VelocityContext();
             velocity_context.put("name", vertabrae.title());
@@ -113,6 +114,23 @@ public class SpineBinder
 
             Files.write(page, to_file, Charsets.UTF_8);
         }
+    }
+
+    private static String pick_template(String name) {
+        String template = name+".vm";
+        String val = "default.vm";
+
+        if
+            (FileSystems
+                .getDefault()
+                .getPath("resources", "templates", template)
+                .toFile().exists()
+            )
+        {
+            val = template;
+        }
+
+        return val;
     }
 
     private static void static_files_copy
