@@ -42,48 +42,48 @@ Well, now we are talking.
 
 The layout I use is,
 
-- <project_name>
+- \<project_name\>
     - public/
-        - <generated web root>
+        - \<generated web root\>
     - resources/
         - content/
-            - <content_x>.md
+            - \<content_x\>.md
         - static/
-            - <static_files>
+            - \<static_files\>
         - templates/
-            - <default.vm>
+            - \<default.vm\>
             - <content_x>.vm
     - src/
         - main/
             - java/
                 - vardevs.veng.Start
     - target/
-        - <project_name>-<version>.jar
+        - \<project_name\>-\<version\>.jar
 
 
 Start.java looks like this:
 
-> package vardevs.<project_name>;
->
-> import vardevs.vivalab.spine.Spine;
-> import vardevs.vivalab.spine.SpineBinder;
->
-> import java.nio.file.FileSystems;
-> import java.nio.file.Path;
->
-> public class Start {
->     public static void main
->         (String[] args)
->         throws Exception
->     {
->         Path from = FileSystems.getDefault().getPath("resources");
->         Path to = FileSystems.getDefault().getPath("public");
->
->         String compiled_app = SpineBinder.compile(from, to);
->         Spine app = new Spine(8080, compiled_app);
->         app.up();
->     }
-> }
+    package vardevs.\<project_name\>;
+
+    import vardevs.vivalab.spine.Spine;
+    import vardevs.vivalab.spine.SpineBinder;
+
+    import java.nio.file.FileSystems;
+    import java.nio.file.Path;
+
+    public class Start {
+        public static void main
+            (String[] args)
+            throws Exception
+        {
+            Path from = FileSystems.getDefault().getPath("resources");
+            Path to = FileSystems.getDefault().getPath("public");
+
+            String compiled_app = SpineBinder.compile(from, to);
+            Spine app = new Spine(8080, compiled_app);
+            app.up();
+        }
+    }
 
 That's all there's to it.
 
