@@ -16,10 +16,6 @@ import java.io.StringWriter;
 import java.nio.file.*;
 import java.util.*;
 
-/**
- * The compiler, indeed, just does what you might expect. It takes all
- * vertabrae and combines them into a spine. I call it, the spine binder.
- */
 public class SpineBinder
 {
 
@@ -58,7 +54,7 @@ public class SpineBinder
         return abs_path_to.toAbsolutePath().toString();
     }
 
-    public static Map<String, Vertabrae> extract_files
+    private static Map<String, Vertabrae> extract_files
         (Path dir)
         throws IOException
     {
@@ -122,15 +118,30 @@ public class SpineBinder
 
         if
             (FileSystems
-                .getDefault()
-                .getPath("resources", "templates", template)
-                .toFile().exists()
+            .getDefault()
+            .getPath("resources", "templates", template)
+            .toFile().exists()
             )
         {
             val = template;
         }
 
         return val;
+    }
+
+    private static String merge
+        (String template, VelocityContext velocity_context)
+    {
+        Template def = velocity_engine.getTemplate
+            (FileSystems
+                    .getDefault()
+                    .getPath("resources", "templates", template)
+                    .toString()
+            );
+
+        StringWriter sw = new StringWriter();
+        def.merge(velocity_context, sw);
+        return sw.toString();
     }
 
     private static void static_files_copy
@@ -151,20 +162,5 @@ public class SpineBinder
                 Integer.MAX_VALUE, new CopyDirectoryVisitor
                     (from, to)
             );
-    }
-
-    private static String merge
-        (String template, VelocityContext velocity_context)
-    {
-        Template def = velocity_engine.getTemplate
-            (FileSystems
-                .getDefault()
-                .getPath("resources", "templates", template)
-                .toString()
-            );
-
-        StringWriter sw = new StringWriter();
-        def.merge(velocity_context, sw);
-        return sw.toString();
     }
 }

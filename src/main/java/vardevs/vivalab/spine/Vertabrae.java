@@ -6,9 +6,6 @@ import com.google.common.io.Files;
 import java.io.IOException;
 import java.nio.file.Path;
 
-/**
- *
- */
 public class Vertabrae {
     private final String file_name;
     private final String title;
