@@ -1,9 +1,10 @@
-package vardevs.vivalab;
+package vardevs.vivalab.spine;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import vardevs.vivalab.spine.servlet.AdminServlet;
 
 import java.io.IOException;
 
@@ -25,6 +26,7 @@ public class Spine {
         server.setHandler(context);
 
         context.addServlet(new ServletHolder(new DefaultServlet()), "/*");
+        context.addServlet(new ServletHolder(new AdminServlet()), "/admin");
     }
 
     public void up() throws Exception {

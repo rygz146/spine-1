@@ -1,4 +1,4 @@
-package vardevs.vivalab;
+package vardevs.vivalab.spine;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Function;
@@ -58,7 +58,7 @@ public class SpineBinder
         return abs_path_to.toAbsolutePath().toString();
     }
 
-    private static Map<String, Vertabrae> extract_files
+    public static Map<String, Vertabrae> extract_files
         (Path dir)
         throws IOException
     {
