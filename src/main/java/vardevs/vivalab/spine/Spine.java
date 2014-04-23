@@ -8,9 +8,6 @@ import vardevs.vivalab.spine.servlet.AdminServlet;
 
 import java.io.IOException;
 
-/**
- * Spine
- */
 public class Spine {
 
     private final Server server;

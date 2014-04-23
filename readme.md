@@ -14,6 +14,8 @@ A short escape if there ever was one. Shy of 2 months later there are 7 dependen
 and this is without the aid of any "modern" dependency management tool. It is a
 slippery slope, glazed with the blood of good intention.
 
+And a couple of weeks later we have Maven .. Slippery slope, indeed.
+
 These are the spoils of war:
 
 * javax.servlet-api-3.1.0.jar
@@ -32,5 +34,57 @@ screwed the pooch already.
 This holds true then as now:
 
     Stop work time and begin playtime. Make something cool.
+
+Usage
+=====
+
+Well, now we are talking.
+
+The layout I use is,
+
+* <project_name>
+** public/
+*** <generated web root>
+** resources/
+*** content/
+**** <content_x>.md
+*** static/
+**** <static_files>
+*** templates/
+**** <default.vm>
+**** <content_x>.vm
+** src/
+*** main/
+**** java/
+***** vardevs.veng.Start
+** target/
+*** <project_name>-<version>.jar
+
+
+Start.java looks like this:
+
+    package vardevs.<project_name>;
+
+    import vardevs.vivalab.spine.Spine;
+    import vardevs.vivalab.spine.SpineBinder;
+
+    import java.nio.file.FileSystems;
+    import java.nio.file.Path;
+
+    public class Start {
+        public static void main
+            (String[] args)
+            throws Exception
+        {
+            Path from = FileSystems.getDefault().getPath("resources");
+            Path to = FileSystems.getDefault().getPath("public");
+
+            String compiled_app = SpineBinder.compile(from, to);
+            Spine app = new Spine(8080, compiled_app);
+            app.up();
+        }
+    }
+
+That's all there's to it.
 
 /v.
