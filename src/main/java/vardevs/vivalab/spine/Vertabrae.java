@@ -1,4 +1,4 @@
-package vardevs.vivalab;
+package vardevs.vivalab.spine;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;

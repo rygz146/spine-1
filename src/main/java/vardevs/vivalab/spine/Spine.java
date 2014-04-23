@@ -1,21 +1,22 @@
-package vardevs.vivalab;
+package vardevs.vivalab.spine;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import vardevs.vivalab.spine.servlet.AdminServlet;
 
 import java.io.IOException;
 
 /**
- * Application
+ * Spine
  */
-public class Application {
+public class Spine {
 
     private final Server server;
     private final ServletContextHandler context;
 
-    public Application(int port, String path) throws IOException {
+    public Spine(int port, String path) throws IOException {
         server = new Server(port);
         context = new ServletContextHandler
             (ServletContextHandler.SESSIONS);
@@ -25,6 +26,7 @@ public class Application {
         server.setHandler(context);
 
         context.addServlet(new ServletHolder(new DefaultServlet()), "/*");
+        context.addServlet(new ServletHolder(new AdminServlet()), "/admin");
     }
 
     public void up() throws Exception {
