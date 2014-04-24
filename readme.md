@@ -1,7 +1,7 @@
 Spine
 =====
 
-Jump: [installation](#install), [usage](#use)
+Jump: [installation](#installation), [usage](#usage)
 
 We get so much for "free" when building nowadays that my day consists of
 consuming rather than producing.
@@ -27,7 +27,8 @@ By end of 2014 all of them will be replaced with hand-rolled counterparts. _\[ed
 Hah, now that I've pulled in guava for "something neat" I've pretty much
 screwed the pooch already.
 
-# Installation {#install}
+Installation
+============
 
 I don't like context-clipping so here's the full pom.xml for a site that wants to use spine.
 
@@ -88,7 +89,8 @@ I don't like context-clipping so here's the full pom.xml for a site that wants t
 
 You need to build spine with maven before it's available in your repository. I haven't put it on central yet.
 
-# Usage {#use}
+Usage
+=====
 
 Well, now we are talking.
 
