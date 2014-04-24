@@ -143,6 +143,12 @@ I don't like context-clipping so here's the full `pom.xml` for the project that 
         </build>
 
     </project>
+    
+To run your web application is just a command away:
+
+    $ java -jar <project_name>-<version_string>.jar
+    
+Set up a reverse proxy and supervisor, and you are done.
 
 This holds true then as now:
 
