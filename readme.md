@@ -30,7 +30,64 @@ screwed the pooch already.
 Installation
 ============
 
-I don't like context-clipping so here's the full pom.xml for a site that wants to use spine.
+You need to build spine with maven before it's available in your repository. I haven't put it on central yet.
+
+    $ git clone git@github.com:varl/spine.git
+    $ cd spine
+    $ mvn clean install
+
+Usage
+=====
+
+Well, now we are talking.
+
+The layout I use is,
+
+- \<project_name\>
+    - `pom.xml`
+    - public/
+        - \<generated web root\>
+    - resources/
+        - content/
+            - \<content_x\>.md
+        - static/
+            - \<static_files\>
+        - templates/
+            - \<default.vm\>
+            - <content_x>.vm
+    - src/
+        - main/
+            - java/
+                - `group_name.project_name.Start`
+    - target/
+        - \<project_name\>-\<version_string\>.jar
+
+
+`Start.java` looks like this:
+
+    package vardevs.<project_name>;
+
+    import vardevs.vivalab.spine.Spine;
+    import vardevs.vivalab.spine.SpineBinder;
+
+    import java.nio.file.FileSystems;
+    import java.nio.file.Path;
+
+    public class Start {
+        public static void main
+            (String[] args)
+            throws Exception
+        {
+            Path from = FileSystems.getDefault().getPath("resources");
+            Path to = FileSystems.getDefault().getPath("public");
+
+            String compiled_app = SpineBinder.compile(from, to);
+            Spine app = new Spine(8080, compiled_app);
+            app.up();
+        }
+    }
+    
+I don't like context-clipping so here's the full `pom.xml` for the project that contains `Start.java`.
 
     <?xml version="1.0" encoding="UTF-8"?>
     <project xmlns="http://maven.apache.org/POM/4.0.0"
@@ -75,7 +132,7 @@ I don't like context-clipping so here's the full pom.xml for a site that wants t
                             <configuration>
                                 <transformers>
                                     <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                        <mainClass>vardevs.veng.Start</mainClass>
+                                        <mainClass>group_name.project_name.Start</mainClass>
                                     </transformer>
                                 </transformers>
                             </configuration>
@@ -86,58 +143,6 @@ I don't like context-clipping so here's the full pom.xml for a site that wants t
         </build>
 
     </project>
-
-You need to build spine with maven before it's available in your repository. I haven't put it on central yet.
-
-Usage
-=====
-
-Well, now we are talking.
-
-The layout I use is,
-
-- \<project_name\>
-    - public/
-        - \<generated web root\>
-    - resources/
-        - content/
-            - \<content_x\>.md
-        - static/
-            - \<static_files\>
-        - templates/
-            - \<default.vm\>
-            - <content_x>.vm
-    - src/
-        - main/
-            - java/
-                - vardevs.veng.Start
-    - target/
-        - \<project_name\>-\<version\>.jar
-
-
-Start.java looks like this:
-
-    package vardevs.<project_name>;
-
-    import vardevs.vivalab.spine.Spine;
-    import vardevs.vivalab.spine.SpineBinder;
-
-    import java.nio.file.FileSystems;
-    import java.nio.file.Path;
-
-    public class Start {
-        public static void main
-            (String[] args)
-            throws Exception
-        {
-            Path from = FileSystems.getDefault().getPath("resources");
-            Path to = FileSystems.getDefault().getPath("public");
-
-            String compiled_app = SpineBinder.compile(from, to);
-            Spine app = new Spine(8080, compiled_app);
-            app.up();
-        }
-    }
 
 This holds true then as now:
 
