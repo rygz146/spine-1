@@ -18,8 +18,15 @@ import java.util.*;
 
 public class SpineBinder
 {
-
     public static final VelocityEngine velocity_engine = new VelocityEngine();
+
+    public static void main(String[] args) {
+        Path from = FileSystems.getDefault().getPath("resources");
+        Path to = FileSystems.getDefault().getPath("src", "main", "resources", "public");
+
+        String compiled_app = compile(from, to);
+        System.out.println("[SPINE] App compiled to " + compiled_app);
+    }
 
     /**
      * Compile takes an absolute path of the app and returns an absolute path

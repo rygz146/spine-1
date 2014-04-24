@@ -32,9 +32,7 @@ Installation
 
 You need to build spine with maven before it's available in your repository. I haven't put it on central yet.
 
-    $ git clone git@github.com:varl/spine.git
-    $ cd spine
-    $ mvn clean install
+    $ git clone git@github.com:varl/spine.git &&  cd spine && mvn clean install
 
 Usage
 =====
@@ -45,8 +43,6 @@ The layout I use is,
 
 - \<project_name\>
     - `pom.xml`
-    - public/
-        - \<generated web root\>
     - resources/
         - content/
             - \<content_x\>.md
@@ -59,13 +55,15 @@ The layout I use is,
         - main/
             - java/
                 - `group_name.project_name.Start`
+            - resources/
+                - public/
+                    - \<generated web root\>
     - target/
         - \<project_name\>-\<version_string\>.jar
 
-
 `Start.java` looks like this:
 
-    package vardevs.<project_name>;
+    package vardevs.veng;
 
     import vardevs.vivalab.spine.Spine;
     import vardevs.vivalab.spine.SpineBinder;
@@ -78,11 +76,7 @@ The layout I use is,
             (String[] args)
             throws Exception
         {
-            Path from = FileSystems.getDefault().getPath("resources");
-            Path to = FileSystems.getDefault().getPath("public");
-
-            String compiled_app = SpineBinder.compile(from, to);
-            Spine app = new Spine(8080, compiled_app);
+            Spine app = new Spine(8080);
             app.up();
         }
     }
@@ -95,9 +89,9 @@ I don't like context-clipping so here's the full `pom.xml` for the project that 
              xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
         <modelVersion>4.0.0</modelVersion>
 
-        <groupId>group_name</groupId>
-        <artifactId>project_name</artifactId>
-        <version>version_string</version>
+        <groupId>vardevs</groupId>
+        <artifactId>veng</artifactId>
+        <version>1.0-SNAPSHOT</version>
         <packaging>jar</packaging>
 
         <dependencies>
@@ -119,6 +113,25 @@ I don't like context-clipping so here's the full `pom.xml` for the project that 
                         <target>1.8</target>
                     </configuration>
                 </plugin>
+
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
+                    <version>1.1</version>
+                    <executions>
+                        <execution>
+                            <id>build-site</id>
+                            <phase>generate-resources</phase>
+                            <goals>
+                                <goal>java</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <mainClass>vardevs.vivalab.spine.SpineBinder</mainClass>
+                    </configuration>
+                </plugin>
+
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
@@ -132,7 +145,7 @@ I don't like context-clipping so here's the full `pom.xml` for the project that 
                             <configuration>
                                 <transformers>
                                     <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                        <mainClass>group_name.project_name.Start</mainClass>
+                                        <mainClass>vardevs.veng.Start</mainClass>
                                     </transformer>
                                 </transformers>
                             </configuration>
@@ -144,6 +157,10 @@ I don't like context-clipping so here's the full `pom.xml` for the project that 
 
     </project>
     
+The `pom.xml` creates a standalone jar for you to deploy where you please.
+
+    $ cd <project_name> && mvn package
+
 To run your web application is just a command away:
 
     $ java -jar <project_name>-<version_string>.jar

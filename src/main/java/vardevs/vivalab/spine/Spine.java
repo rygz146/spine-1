@@ -13,10 +13,12 @@ public class Spine {
     private final Server server;
     private final ServletContextHandler context;
 
-    public Spine(int port, String path) throws IOException {
+    public Spine(int port) throws IOException {
         server = new Server(port);
         context = new ServletContextHandler
             (ServletContextHandler.SESSIONS);
+
+        String path = this.getClass().getClassLoader().getResource("public").toExternalForm();
 
         context.setResourceBase(path);
         context.setContextPath("/");
@@ -28,6 +30,7 @@ public class Spine {
 
     public void up() throws Exception {
         if (!server.isStarted()) {
+            System.out.println("[SPINE] Starting application at " + server.getURI());
             server.start();
             server.join();
         }
