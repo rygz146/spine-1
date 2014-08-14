@@ -5,6 +5,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.Maps;
 import com.google.common.io.ByteSource;
 import com.google.common.io.Files;
+import org.apache.commons.lang.time.DateUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -14,11 +15,16 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.*;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class SpineBinder
 {
     public static final VelocityEngine velocity_engine = new VelocityEngine();
+    private static final Markdown4jProcessor md = new Markdown4jProcessor();
 
     public static void main(String[] args) {
         Path from = FileSystems.getDefault().getPath("resources");
@@ -41,7 +47,6 @@ public class SpineBinder
     public static String
         compile(Path abs_path_from, Path abs_path_to)
     {
-        Markdown4jProcessor md = new Markdown4jProcessor();
         velocity_engine.init();
 
         try {
@@ -51,7 +56,7 @@ public class SpineBinder
             Map<String, Vertabrae> file_names =
                 extract_files(dir);
 
-            generate_markup(abs_path_to, md, file_names);
+            generate_markup(abs_path_to, file_names);
             static_files_copy(abs_path_from, abs_path_to);
 
         } catch (IOException e) {
@@ -78,14 +83,13 @@ public class SpineBinder
                 (from_file);
 
             file_names.put(vertabrae.file_name(), vertabrae);
-
         }
         directory_stream.close();
         return file_names;
     }
 
     private static void generate_markup
-        (Path abs_path_to, Markdown4jProcessor md, Map<String, Vertabrae> file_names)
+        (Path abs_path_to, Map<String, Vertabrae> file_names)
         throws IOException
     {
         Function<Vertabrae, String> title =
@@ -93,13 +97,22 @@ public class SpineBinder
 
         Map<String, String> toc = Maps.transformValues(file_names, title);
 
+        Set<String> files = file_names.keySet();
+
+        Set<String> filtered_files = files
+                .stream()
+                .filter(file -> !file.contains("_"))
+                .collect(Collectors.toSet());
+
         for
-            (String key : file_names.keySet())
+            (String key : filtered_files)
         {
             Vertabrae vertabrae = file_names.get(key);
 
             ByteSource bs = Files.asByteSource(vertabrae.path().toFile());
             String html = md.process(bs.openBufferedStream());
+
+            Set<String> relevant_files = files.stream().filter(file -> file.contains(key+"_")).collect(Collectors.toSet());
 
             String template = pick_template(vertabrae.file_name());
 
@@ -107,6 +120,12 @@ public class SpineBinder
             velocity_context.put("name", vertabrae.title());
             velocity_context.put("content", html);
             velocity_context.put("pages", toc);
+
+            Map<String, String> content_files = content_for(relevant_files, file_names);
+
+            for (String index : content_files.keySet()) {
+                velocity_context.put("content_"+index, content_files.get(index));
+            }
 
             String page = merge(template, velocity_context);
 
@@ -117,6 +136,28 @@ public class SpineBinder
 
             Files.write(page, to_file, Charsets.UTF_8);
         }
+    }
+
+    private static Map<String, String> content_for
+            (Set<String> relevant_files, Map<String, Vertabrae> file_names)
+
+    {
+
+        Map<String, String> result = new HashMap<>();
+        for (String file: relevant_files) {
+            String index = file.substring(file.length()-1);
+
+            Vertabrae vertabrae = file_names.get(file);
+            ByteSource bs = Files.asByteSource(vertabrae.path().toFile());
+            String html;
+            try {
+                html = md.process(bs.openBufferedStream());
+                result.put(index, html);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return result;
     }
 
     private static String pick_template(String name) {
