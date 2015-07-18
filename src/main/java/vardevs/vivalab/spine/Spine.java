@@ -4,23 +4,51 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-import vardevs.vivalab.spine.servlet.AdminServlet;
+
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.InvalidRemoteException;
+import org.eclipse.jgit.api.errors.TransportException;
+
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.Path;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import java.io.IOException;
+
+import vardevs.vivalab.spine.servlet.AdminServlet;
+import vardevs.vivalab.spine.SpineBinder;
 
 public class Spine {
 
     private final Server server;
     private final ServletContextHandler context;
 
-    public Spine(int port) throws IOException {
+    public Spine(int port, String repo) throws IOException, GitAPIException, URISyntaxException {
         server = new Server(port);
         context = new ServletContextHandler
             (ServletContextHandler.SESSIONS);
 
-        String path = this.getClass().getClassLoader().getResource("public").toExternalForm();
+        Path localPath = Files.createTempFile("temp", "");
+        Files.delete(localPath);
 
-        context.setResourceBase(path);
+        Path publicPath = Paths.get("public");
+        
+        if (!Files.exists(publicPath)) {
+          publicPath = Files.createDirectory(publicPath);
+        }
+
+        Git.cloneRepository()
+          .setURI(repo)
+          .setDirectory(localPath.toFile())
+          .call().close();
+
+        String servePath = SpineBinder.compile(localPath, publicPath);
+
+        context.setResourceBase(servePath);
         context.setContextPath("/");
         server.setHandler(context);
 
@@ -39,5 +67,4 @@ public class Spine {
     public void down() throws Exception {
         server.stop();
     }
-
 }
