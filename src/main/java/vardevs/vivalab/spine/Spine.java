@@ -28,6 +28,9 @@ public class Spine {
     private final ServletContextHandler context;
 
     public Spine(int port, String repo) throws IOException, GitAPIException, URISyntaxException {
+        System.out.println("[SPINE] Using port: " + port);
+        System.out.println("[SPINE] Attempting to serve remote repo: " + repo);
+
         server = new Server(port);
         context = new ServletContextHandler
             (ServletContextHandler.SESSIONS);
