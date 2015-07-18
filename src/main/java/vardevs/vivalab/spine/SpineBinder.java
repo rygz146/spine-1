@@ -99,7 +99,7 @@ public class SpineBinder
 
         Set<String> filtered_files = files
                 .stream()
-                //.filter(file -> !file.contains("_"))
+                .filter(file -> !file.contains("_"))
                 .collect(Collectors.toSet());
 
         for
