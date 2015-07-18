@@ -13,4 +13,6 @@ and you are done.
 Check out the structure used in [vlv-spine](https://github.com/varl/vlv-spine)
 for content, templates and static artifacts.
 
+Visit [vlv.io](http://vlv.io) to see the result in action.
+
 /v.
