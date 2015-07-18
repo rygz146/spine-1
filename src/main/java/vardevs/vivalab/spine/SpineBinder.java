@@ -7,6 +7,7 @@ import com.google.common.io.ByteSource;
 import com.google.common.io.Files;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.velocity.Template;
+import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.markdown4j.Markdown4jProcessor;
@@ -26,14 +27,6 @@ public class SpineBinder
     public static final VelocityEngine velocity_engine = new VelocityEngine();
     private static final Markdown4jProcessor md = new Markdown4jProcessor();
 
-    public static void main(String[] args) {
-        Path from = FileSystems.getDefault().getPath("resources");
-        Path to = FileSystems.getDefault().getPath("src", "main", "resources", "public");
-
-        String compiled_app = compile(from, to);
-        System.out.println("[SPINE] App compiled to " + compiled_app);
-    }
-
     /**
      * Compile takes an absolute path of the app and returns an absolute path
      * of the resulting Vertabrae.
@@ -47,16 +40,20 @@ public class SpineBinder
     public static String
         compile(Path abs_path_from, Path abs_path_to)
     {
+        System.out.println("[SPINE] Template path: " +  abs_path_from);
+        velocity_engine.setProperty(RuntimeConstants.FILE_RESOURCE_LOADER_PATH, abs_path_from.resolve("templates").toString());
         velocity_engine.init();
 
+        System.out.println("[SPINE] From path: " +  abs_path_from);
+        System.out.println("[SPINE] To path: " + abs_path_to);
+        
         try {
-            Path dir = FileSystems.getDefault().getPath
-                (abs_path_from.toAbsolutePath().toString(), "content");
+            Path dir = abs_path_from.resolve("content");
 
             Map<String, Vertabrae> file_names =
                 extract_files(dir);
 
-            generate_markup(abs_path_to, file_names);
+            generate_markup(abs_path_from, abs_path_to, file_names);
             static_files_copy(abs_path_from, abs_path_to);
 
         } catch (IOException e) {
@@ -83,13 +80,14 @@ public class SpineBinder
                 (from_file);
 
             file_names.put(vertabrae.file_name(), vertabrae);
+            System.out.println("[SPINE] Vertabrae file name: "+ vertabrae.file_name());
         }
         directory_stream.close();
         return file_names;
     }
 
     private static void generate_markup
-        (Path abs_path_to, Map<String, Vertabrae> file_names)
+        (Path abs_path_from, Path abs_path_to, Map<String, Vertabrae> file_names)
         throws IOException
     {
         Function<Vertabrae, String> title =
@@ -101,7 +99,7 @@ public class SpineBinder
 
         Set<String> filtered_files = files
                 .stream()
-                .filter(file -> !file.contains("_"))
+                //.filter(file -> !file.contains("_"))
                 .collect(Collectors.toSet());
 
         for
@@ -114,7 +112,7 @@ public class SpineBinder
 
             Set<String> relevant_files = files.stream().filter(file -> file.contains(key+"_")).collect(Collectors.toSet());
 
-            String template = pick_template(vertabrae.file_name());
+            String template = pick_template(abs_path_from, vertabrae.file_name());
 
             VelocityContext velocity_context = new VelocityContext();
             velocity_context.put("name", vertabrae.title());
@@ -127,6 +125,8 @@ public class SpineBinder
                 velocity_context.put("content_"+index, content_files.get(index));
             }
 
+            System.out.println("[SPINE] Template: " + template);
+            
             String page = merge(template, velocity_context);
 
             File to_file = new File
@@ -160,16 +160,12 @@ public class SpineBinder
         return result;
     }
 
-    private static String pick_template(String name) {
+    private static String pick_template(Path abs_path_from, String name) {
         String template = name+".vm";
         String val = "default.vm";
 
         if
-            (FileSystems
-            .getDefault()
-            .getPath("resources", "templates", template)
-            .toFile().exists()
-            )
+            (java.nio.file.Files.exists(abs_path_from.resolve("templates").resolve(template)))
         {
             val = template;
         }
@@ -180,12 +176,7 @@ public class SpineBinder
     private static String merge
         (String template, VelocityContext velocity_context)
     {
-        Template def = velocity_engine.getTemplate
-            (FileSystems
-                    .getDefault()
-                    .getPath("resources", "templates", template)
-                    .toString()
-            );
+        Template def = velocity_engine.getTemplate(template);
 
         StringWriter sw = new StringWriter();
         def.merge(velocity_context, sw);
@@ -196,13 +187,8 @@ public class SpineBinder
         (Path abs_path_from, Path abs_path_to)
         throws IOException
     {
-        Path from = FileSystems.getDefault()
-            .getPath
-                (abs_path_from.toAbsolutePath().toString(), "static");
-
-        Path to = FileSystems.getDefault()
-            .getPath
-                (abs_path_to.toAbsolutePath().toString(), "static");
+        Path from = abs_path_from.resolve("static");
+        Path to = abs_path_to.resolve("static");
 
         java.nio.file.Files.walkFileTree
             (from,

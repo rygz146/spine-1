@@ -16,7 +16,7 @@ public class Vertabrae {
         throws IOException
     {
         this.file_name =
-            Files.getNameWithoutExtension(from_file.toFile().getAbsolutePath());
+            Files.getNameWithoutExtension(from_file.toString());
 
         this.title = Files.readFirstLine
             (from_file.toFile(), Charsets.UTF_8);

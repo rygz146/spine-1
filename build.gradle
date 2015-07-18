@@ -1,5 +1,8 @@
-apply plugin: 'java'
-apply plugin: 'maven'
+plugins {
+  id 'java'
+  id 'maven'
+  id 'com.github.johnrengelman.shadow' version '1.2.2'
+}
 
 group = 'vardevs.vivalab'
 version = '1.0-SNAPSHOT'
@@ -10,8 +13,9 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 repositories {
-     maven { url "http://repo.maven.apache.org/maven2" }
+  jcenter()
 }
+
 dependencies {
     compile group: 'commons-collections', name: 'commons-collections', version:'3.2.1'
     compile group: 'commons-lang', name: 'commons-lang', version:'2.4'
@@ -20,4 +24,11 @@ dependencies {
     compile group: 'org.eclipse.jetty.aggregate', name: 'jetty-all', version:'9.1.4.v20140401'
     compile group: 'org.commonjava.googlecode.markdown4j', name: 'markdown4j', version:'2.2-cj-1.0'
     compile group: 'org.apache.velocity', name: 'velocity', version:'1.7'
+    compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version:'4.0.1.201506240215-r'
+}
+
+jar {
+  manifest {
+    attributes 'Main-Class': 'vardevs.vivalab.spine.Start'
+  }
 }
