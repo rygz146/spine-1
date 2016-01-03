@@ -7,67 +7,82 @@ import org.eclipse.jetty.servlet.ServletHolder;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.api.errors.InvalidRemoteException;
-import org.eclipse.jgit.api.errors.TransportException;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.Path;
+import java.nio.file.*;
 
-import java.net.URI;
 import java.net.URISyntaxException;
 
 import java.io.IOException;
-
-import vardevs.vivalab.spine.servlet.AdminServlet;
-import vardevs.vivalab.spine.SpineBinder;
+import java.nio.file.attribute.BasicFileAttributes;
 
 public class Spine {
 
     private final Server server;
     private final ServletContextHandler context;
+    private final Path localPath = Files.createTempFile("temp", "");
 
-    public Spine(int port, String repo) throws IOException, GitAPIException, URISyntaxException {
+    public Spine(int port, String repo)
+            throws IOException, GitAPIException, URISyntaxException {
         System.out.println("[SPINE] Using port: " + port);
         System.out.println("[SPINE] Attempting to serve remote repo: " + repo);
 
         server = new Server(port);
-        context = new ServletContextHandler
-            (ServletContextHandler.SESSIONS);
-
-        Path localPath = Files.createTempFile("temp", "");
-        Files.delete(localPath);
+        context = new ServletContextHandler(ServletContextHandler.SESSIONS);
 
         Path publicPath = Paths.get("public");
-        
+
         if (!Files.exists(publicPath)) {
-          publicPath = Files.createDirectory(publicPath);
+            publicPath = Files.createDirectory(publicPath);
         }
 
+        Files.delete(localPath);
         Git.cloneRepository()
-          .setURI(repo)
-          .setDirectory(localPath.toFile())
-          .call().close();
+                .setURI(repo)
+                .setDirectory(localPath.toFile())
+                .call().close();
 
         String servePath = SpineBinder.compile(localPath, publicPath);
 
         context.setResourceBase(servePath);
         context.setContextPath("/");
-        server.setHandler(context);
 
         context.addServlet(new ServletHolder(new DefaultServlet()), "/*");
-        context.addServlet(new ServletHolder(new AdminServlet()), "/admin");
+
+        server.setHandler(context);
     }
 
-    public void up() throws Exception {
-        if (!server.isStarted()) {
-            System.out.println("[SPINE] Starting application at " + server.getURI());
+    public void up() {
+        System.out.println("[SPINE] Starting application at " + server.getURI());
+        try {
             server.start();
             server.join();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
-    public void down() throws Exception {
-        server.stop();
+    public void down() {
+        System.out.println("[SPINE] Stopping application...");
+        try {
+            Files.walkFileTree(localPath, new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    Files.delete(file);
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                    Files.delete(dir);
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+
+            if (server.isStarted()) {
+                server.stop();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
